@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>녹음 호환성 테스트</title>
+<style>
+  :root { --bg:#faf8f4; --fg:#222; --muted:#777; --accent:#6b4f2a; --card:#fff; --line:#e5e0d8; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: -apple-system, system-ui, sans-serif; background:var(--bg); color:var(--fg); }
+  main { max-width:520px; margin:0 auto; padding:16px; }
+  h1 { font-size:20px; margin:8px 0 4px; }
+  .muted { color:var(--muted); font-size:13px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; margin:12px 0; }
+  button { font-size:17px; padding:14px; width:100%; border:0; border-radius:10px; background:var(--accent); color:#fff; margin-top:8px; }
+  button:disabled { opacity:.4; }
+  button.secondary { background:#ddd; color:#222; }
+  input { width:100%; font-size:16px; padding:10px; border:1px solid var(--line); border-radius:8px; }
+  audio { width:100%; margin-top:6px; }
+  .item { border-top:1px solid var(--line); padding:10px 0; }
+  .item:first-child { border-top:0; }
+  .tag { display:inline-block; font-size:12px; padding:2px 8px; border-radius:20px; background:#eee; margin-right:4px; }
+  .ok { color:#1a7f37; } .bad { color:#c62828; }
+  pre { white-space:pre-wrap; font-size:12px; background:#f3f1ec; padding:8px; border-radius:8px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>🎙️ 녹음 호환성 테스트</h1>
+  <div class="muted">안드로이드 ↔ 아이폰 녹음 재생 확인용 (1단계)</div>
+
+  <div class="card">
+    <label class="muted">이름 (누가 녹음했는지 표시)</label>
+    <input id="name" placeholder="예: 엄마">
+    <div id="env" class="muted" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card">
+    <button id="rec">● 녹음 시작</button>
+    <button id="stop" class="secondary" disabled>■ 정지 & 저장</button>
+    <div id="status" class="muted" style="margin-top:8px"></div>
+    <div id="pending" class="muted"></div>
+    <button id="retry" class="secondary" style="display:none">업로드 다시 시도</button>
+  </div>
+
+  <div class="card">
+    <b>가족 녹음 목록</b>
+    <button id="refresh" class="secondary">새로고침</button>
+    <div id="list"></div>
+  </div>
+
+  <details class="card"><summary class="muted">기술 정보 (문제 생기면 캡처해서 보내주세요)</summary><pre id="diag"></pre></details>
+</main>
+
+<script>
+// ===== Supabase 설정 =====
+const SUPABASE_URL = 'https://flxwfciohthhrobmojpk.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_WLhXuU8x07ncuTj0eoVAYA_Su6-g-KM';
+const BUCKET = 'test-audio';
+// =========================
+
+// 외부 라이브러리 없이 Supabase Storage API를 직접 호출
+const S = `${SUPABASE_URL}/storage/v1`;
+const sb = { storage: { from: bucket => ({
+  async upload(path, blob, { contentType }) {
+    try {
+      const r = await fetch(`${S}/object/${bucket}/${path}`, { method: 'POST',
+        headers: { apikey: SUPABASE_KEY, 'Content-Type': contentType, 'x-upsert': 'true' }, body: blob });
+      return { error: r.ok ? null : { message: `${r.status} ${await r.text()}` } };
+    } catch (e) { return { error: { message: '인터넷 연결 확인: ' + e.message } }; }
+  },
+  async list(prefix, { limit, sortBy }) {
+    try {
+      const r = await fetch(`${S}/object/list/${bucket}`, { method: 'POST',
+        headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prefix, limit, offset: 0, sortBy }) });
+      return r.ok ? { data: await r.json() } : { error: { message: `${r.status} ${await r.text()}` } };
+    } catch (e) { return { error: { message: e.message } }; }
+  },
+  getPublicUrl: path => ({ data: { publicUrl: `${S}/object/public/${bucket}/${path}` } }),
+}) } };
+const $ = id => document.getElementById(id);
+const ua = navigator.userAgent;
+const platform = /iPhone|iPad|iPod/.test(ua) ? 'iphone' : /Android/.test(ua) ? 'android' : 'pc';
+
+// 녹음 형식 선택: AAC(mp4)를 우선 → 아이폰·안드로이드 모두 재생 가능성이 가장 높음
+const CANDIDATES = ['audio/mp4;codecs=mp4a.40.2', 'audio/mp4', 'audio/aac', 'audio/webm;codecs=opus', 'audio/webm'];
+const support = Object.fromEntries(CANDIDATES.map(t => [t, !!(window.MediaRecorder && MediaRecorder.isTypeSupported(t))]));
+const chosen = CANDIDATES.find(t => support[t]) || '';
+
+$('name').value = localStorage.getItem('name') || '';
+$('name').onchange = () => localStorage.setItem('name', $('name').value.trim());
+$('env').textContent = `기기: ${platform} · 녹음 형식: ${chosen || '기본값'}`;
+$('diag').textContent = JSON.stringify({ platform, ua, support, chosen }, null, 2);
+
+// ---- IndexedDB: 업로드 전 휴대폰에 먼저 저장 ----
+const dbp = new Promise((res, rej) => {
+  const r = indexedDB.open('recordings', 1);
+  r.onupgradeneeded = () => r.result.createObjectStore('pending', { keyPath: 'path' });
+  r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+});
+async function idb(mode, fn) {
+  const db = await dbp;
+  return new Promise((res, rej) => {
+    const tx = db.transaction('pending', mode); const req = fn(tx.objectStore('pending'));
+    tx.oncomplete = () => res(req && req.result); tx.onerror = () => rej(tx.error);
+  });
+}
+
+let recorder, chunks = [], stream, startedAt;
+
+$('rec').onclick = async () => {
+  if (!$('name').value.trim()) { alert('이름을 먼저 입력해 주세요'); return; }
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (e) { $('status').innerHTML = `<span class="bad">마이크 권한 실패: ${e.message}</span>`; return; }
+  chunks = [];
+  recorder = chosen ? new MediaRecorder(stream, { mimeType: chosen }) : new MediaRecorder(stream);
+  recorder.ondataavailable = e => e.data.size && chunks.push(e.data);
+  recorder.onstop = saveAndUpload;
+  recorder.start(1000);
+  startedAt = Date.now();
+  $('rec').disabled = true; $('stop').disabled = false;
+  $('status').textContent = '녹음 중…';
+};
+
+$('stop').onclick = () => {
+  recorder.stop(); stream.getTracks().forEach(t => t.stop());
+  $('rec').disabled = false; $('stop').disabled = true;
+};
+
+async function saveAndUpload() {
+  const type = (recorder.mimeType || chosen || 'audio/mp4');
+  const blob = new Blob(chunks, { type });
+  const ext = type.includes('webm') ? 'webm' : 'm4a';
+  const secs = Math.round((Date.now() - startedAt) / 1000);
+  const who = encodeURIComponent($('name').value.trim()).replace(/%/g, '_');
+  const path = `${Date.now()}__${who}__${platform}__${secs}s.${ext}`;
+  await idb('readwrite', s => s.put({ path, blob, type: type.split(';')[0] }));
+  $('status').innerHTML = `<span class="ok">휴대폰에 저장됨 (${(blob.size/1024).toFixed(0)}KB, ${type})</span>`;
+  await uploadPending();
+}
+
+async function uploadPending() {
+  const items = await idb('readonly', s => s.getAll());
+  for (const it of items) {
+    $('status').textContent = '업로드 중…';
+    const { error } = await sb.storage.from(BUCKET).upload(it.path, it.blob, { contentType: it.type, upsert: true });
+    if (error) {
+      $('status').innerHTML = `<span class="bad">업로드 실패 (휴대폰엔 저장돼 있음): ${error.message}</span>`;
+      break;
+    }
+    await idb('readwrite', s => s.delete(it.path));
+    $('status').innerHTML = '<span class="ok">업로드 완료 ✓</span>';
+  }
+  const left = (await idb('readonly', s => s.getAll())).length;
+  $('pending').textContent = left ? `업로드 대기 ${left}개` : '';
+  $('retry').style.display = left ? 'block' : 'none';
+  loadList();
+}
+$('retry').onclick = uploadPending;
+window.addEventListener('online', uploadPending);
+
+async function loadList() {
+  const { data, error } = await sb.storage.from(BUCKET).list('', { limit: 50, sortBy: { column: 'name', order: 'desc' } });
+  if (error) { $('list').innerHTML = `<div class="bad">목록 실패: ${error.message}</div>`; return; }
+  $('list').innerHTML = '';
+  for (const f of data.filter(f => f.name.includes('__'))) {
+    const [ts, who, plat, len] = f.name.split('__');
+    const url = sb.storage.from(BUCKET).getPublicUrl(f.name).data.publicUrl;
+    const d = new Date(+ts);
+    const el = document.createElement('div'); el.className = 'item';
+    el.innerHTML = `<div><b>${decodeURIComponent(who.replace(/_/g, '%'))}</b>
+      <span class="tag">${plat === 'iphone' ? '🍎 아이폰' : plat === 'android' ? '🤖 안드로이드' : '💻 PC'}</span>
+      <span class="tag">${f.name.split('.').pop()}</span>
+      <span class="muted">${d.toLocaleString('ko-KR')} · ${len.replace(/\..*/, '')}</span></div>
+      <audio controls preload="metadata" src="${url}"></audio>
+      <div class="muted result"></div>`;
+    const a = el.querySelector('audio'), r = el.querySelector('.result');
+    a.onplaying = () => r.innerHTML = '<span class="ok">재생됨 ✓</span>';
+    a.onerror = () => r.innerHTML = '<span class="bad">이 기기에서 재생 불가 ✗</span>';
+    $('list').appendChild(el);
+  }
+  if (!$('list').children.length) $('list').innerHTML = '<div class="muted">아직 녹음이 없어요</div>';
+}
+$('refresh').onclick = loadList;
+uploadPending();
+</script>
+</body>
+</html>
