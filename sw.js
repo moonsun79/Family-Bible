@@ -1,5 +1,5 @@
 // 앱 화면을 휴대폰에 저장해 두어 빠르게 열리게 함 (녹음·데이터는 저장하지 않음)
-const CACHE = 'family-bible-v2';
+const CACHE = 'family-bible-v3';
 const SHELL = ['./', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL))); });
 self.addEventListener('activate', e => e.waitUntil(
