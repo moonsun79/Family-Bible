@@ -1,0 +1,845 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#7a5a32">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="가족성경">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<title>가족 성경 읽기</title>
+<style>
+:root{
+  --bg:#F6F3EE;--surface:#FFFFFF;--surface2:#F1ECE4;--fg:#1E1A16;--muted:#8C8379;--line:rgba(30,26,22,.08);
+  --accent:#8A6A3F;--on-accent:#FFFFFF;--accent-soft:#F3EBDD;--ok:#3F7D4E;--ok-soft:#E5EFE6;--bad:#C2483D;
+  --shadow:0 1px 2px rgba(30,26,22,.04),0 6px 20px rgba(30,26,22,.05);
+  --serif:"Gowun Batang",ui-serif,serif;
+  --sans:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#141210;--surface:#1E1B18;--surface2:#29251F;--fg:#EFE9E1;--muted:#9C9389;--line:rgba(255,255,255,.07);
+  --accent:#D4AE7A;--on-accent:#1A1611;--accent-soft:#2F281F;--ok:#8CCB98;--ok-soft:#1E3024;--bad:#E57F74;--shadow:none}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.5;letter-spacing:-.01em;-webkit-font-smoothing:antialiased}
+#app{max-width:560px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top)) 18px 200px}
+h1{font-family:var(--serif);font-size:28px;font-weight:700;margin:2px 0 4px;letter-spacing:-.02em}
+h2{font-size:13px;font-weight:600;color:var(--muted);margin:30px 4px 10px;letter-spacing:.02em}
+.eyebrow{font-size:13px;color:var(--muted);font-weight:500}
+.muted{color:var(--muted);font-size:14px}small{color:var(--muted);font-size:13px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;margin:12px 0;box-shadow:var(--shadow)}
+button{font:inherit;font-size:16px;font-weight:600;height:50px;padding:0 16px;border:0;border-radius:14px;background:var(--accent);color:var(--on-accent);width:100%;margin-top:12px;cursor:pointer;transition:transform .1s,opacity .2s}
+button:active{transform:scale(.98)}
+button.ghost{background:var(--surface2);color:var(--fg)}
+button.small{width:auto;height:34px;padding:0 12px;font-size:14px;margin:0;border-radius:10px}
+button.link{background:none;color:var(--muted);width:auto;height:auto;padding:6px 8px;margin:0;font-size:13px;font-weight:500}
+button:disabled{opacity:.35}
+input,select,textarea{font:inherit;font-size:16px;width:100%;padding:13px 14px;border:1px solid transparent;border-radius:12px;background:var(--surface2);color:var(--fg);margin-top:6px;outline:none;-webkit-appearance:none;appearance:none}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 20px) 55%,calc(100% - 15px) 55%;background-size:5px 5px;background-repeat:no-repeat;padding-right:36px}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);background:var(--surface)}
+textarea{resize:vertical;line-height:1.55}
+label{display:block;margin-top:16px;font-size:13px;font-weight:600;color:var(--muted)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.title{font-size:17px;font-weight:700}
+.badge{font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:4px 10px;border-radius:20px;white-space:nowrap}
+.big{font-family:var(--serif);font-size:23px;font-weight:700;margin:14px 0 4px;letter-spacing:-.02em}
+.turn{color:var(--accent);font-weight:600;margin:4px 0}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:500;padding:3px 10px 3px 3px;border-radius:20px;background:var(--surface2);color:var(--muted);margin:3px 4px 3px 0}
+.chip.on{background:var(--ok-soft);color:var(--ok)}
+.chip .av{opacity:.55}.chip.on .av{opacity:1}
+.bar{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-top:16px}.bar i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.rec{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.rec .play{width:40px;height:40px;border-radius:50%;padding:0;margin:0;flex:none;background:var(--accent-soft);color:var(--accent);font-size:13px}
+.rec>span{flex:1;min-width:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.rec.now .play{background:var(--accent);color:var(--on-accent)}
+.rec.now>span{color:var(--accent);font-weight:600}
+.note{padding:14px 0;border-top:1px solid var(--line)}.note p{margin:8px 0 0;white-space:pre-wrap;word-break:break-word;font-family:var(--serif);font-size:16px;line-height:1.7}
+.likes{display:flex;align-items:center;gap:6px;margin-top:8px;min-height:30px}
+.like{background:var(--surface2);color:var(--muted);height:30px;width:auto;padding:0 12px;margin:0;font-size:14px;font-weight:600;border-radius:15px}
+.like.on{background:color-mix(in srgb,#D2555A 14%,var(--surface));color:#D2555A}
+.thanks p{font-family:var(--sans);font-size:16px}
+.sub{font-size:13px;font-weight:700;color:var(--accent);margin:14px 0 0}
+.who{display:flex;align-items:center;gap:8px;font-weight:600}
+.av{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;overflow:hidden;flex:none;background:var(--c,#B49B7A);color:#fff;font-size:12px;font-weight:700;vertical-align:middle}
+.av img{width:100%;height:100%;object-fit:cover;display:block}
+.av.sm{width:22px;height:22px;font-size:10px}.av.lg{width:52px;height:52px;font-size:18px}.av.xl{width:72px;height:72px;font-size:24px}
+.seg{display:flex;gap:8px;margin-top:8px}.seg label{flex:1;margin:0;border:1.5px solid transparent;border-radius:14px;padding:12px;text-align:center;color:var(--fg);background:var(--surface2);font-size:15px}
+.seg input{display:none}.seg label:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+nav#tabs{position:fixed;bottom:0;left:0;right:0;background:color-mix(in srgb,var(--surface) 82%,transparent);-webkit-backdrop-filter:saturate(1.6) blur(18px);backdrop-filter:saturate(1.6) blur(18px);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:10}
+nav#tabs button{background:none;color:var(--muted);margin:0;border-radius:0;height:auto;padding:8px 0 8px;font-size:11px;font-weight:500}
+nav#tabs button svg{display:block;margin:0 auto 2px;width:24px;height:24px}
+nav#tabs button.on{color:var(--accent);font-weight:700}
+#player{position:fixed;left:10px;right:10px;bottom:calc(66px + env(safe-area-inset-bottom));z-index:9}
+#player .in{max-width:540px;margin:0 auto;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:10px 12px;box-shadow:0 8px 30px rgba(0,0,0,.12)}
+#player audio{width:100%;height:36px;margin-top:6px}
+#ptitle{font-size:14px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sheet-bg{position:fixed;inset:0;background:rgba(20,16,12,.45);display:flex;align-items:flex-end;justify-content:center;z-index:30;animation:fade .2s}
+.sheet{background:var(--bg);width:100%;max-width:560px;border-radius:26px 26px 0 0;padding:10px 18px calc(20px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto;animation:up .25s cubic-bezier(.2,.8,.2,1)}
+.sheet:before{content:"";display:block;width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 14px}
+.sheet h2{font-family:var(--serif);font-size:22px;color:var(--fg);margin:0 0 4px;letter-spacing:-.02em}
+@keyframes up{from{transform:translateY(40px);opacity:.5}}@keyframes fade{from{opacity:0}}
+.timer{font-size:52px;font-weight:300;text-align:center;font-variant-numeric:tabular-nums;margin:22px 0;letter-spacing:-.02em}
+.recbtn{width:112px;height:112px;border-radius:50%;margin:0 auto;display:block;font-size:16px;box-shadow:0 8px 24px rgba(138,106,63,.3)}
+.recbtn.on{background:var(--bad);color:#fff;animation:pulse 1.4s infinite;box-shadow:0 0 0 0 rgba(194,72,61,.4)}
+@keyframes pulse{50%{box-shadow:0 0 0 14px rgba(194,72,61,0)}}
+#toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top));transform:translateX(-50%) translateY(-8px);background:var(--fg);color:var(--bg);padding:11px 18px;border-radius:24px;font-size:14px;font-weight:500;opacity:0;transition:.3s;z-index:50;pointer-events:none;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%)}
+.code{font-size:34px;letter-spacing:8px;font-weight:700;text-align:center;margin:8px 0;font-variant-numeric:tabular-nums}
+.pending{border-color:#D9B44A;background:color-mix(in srgb,#D9B44A 10%,var(--surface))}
+.order{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.order span{flex:1}.order.off span{color:var(--muted);text-decoration:line-through}
+.done{font-weight:700;color:var(--ok)}
+.center{text-align:center}
+.album{display:flex;gap:12px;overflow-x:auto;padding:4px 0 2px}
+.album figure{margin:0;text-align:center;flex:none;position:relative}
+.album figcaption{font-size:12px;color:var(--muted);margin-top:4px;font-weight:600}
+.album .x{position:absolute;top:-4px;right:-4px;width:22px;height:22px;border-radius:50%;padding:0;margin:0;font-size:11px;background:var(--surface);color:var(--muted);border:1px solid var(--line)}
+.hero{text-align:center;padding:12vh 0 10px}.hero h1{font-size:34px}
+</style>
+</head>
+<body>
+<div id="app"><p class="muted center" style="margin-top:40vh">불러오는 중…</p></div>
+<div id="player" hidden><div class="in">
+  <div class="row"><button class="small ghost" data-act="prev">⏮</button><div id="ptitle"></div><button class="small ghost" data-act="next">⏭</button><button class="link" data-act="pclose">✕</button></div>
+  <audio id="audio" controls preload="none"></audio>
+</div></div>
+<nav id="tabs" hidden>
+  <button data-act="tab" data-tab="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5.5C5.5 4 8.5 4 12 6c3.5-2 6.5-2 9-.5V19c-2.5-1.5-5.5-1.5-9 .5-3.5-2-6.5-2-9-.5z"/><path d="M12 6v13.5"/></svg>오늘</button>
+  <button data-act="tab" data-tab="log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>기록</button>
+  <button data-act="tab" data-tab="listen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4.5" height="6" rx="1.5"/><rect x="16.5" y="14" width="4.5" height="6" rx="1.5"/></svg>듣기</button>
+  <button data-act="tab" data-tab="pray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 8a4.3 4.3 0 0 1 7.5 2.8C19.5 16.4 12 21 12 21z"/></svg>기도</button>
+  <button data-act="tab" data-tab="family"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2A5 5 0 0 1 21 19"/></svg>가족</button>
+</nav>
+<div id="sheet"></div>
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+'use strict';
+// ================= 설정 =================
+const SUPABASE_URL = 'https://flxwfciohthhrobmojpk.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_WLhXuU8x07ncuTj0eoVAYA_Su6-g-KM';
+const BUCKET = 'recordings';
+const APP_VERSION = '1.3 (감사·좋아요)';
+const TZS = [['Asia/Jakarta', '인도네시아 (자카르타)'], ['Asia/Seoul', '한국 (서울)']];
+// ========================================
+
+const BOOKS = [['창세기',50],['출애굽기',40],['레위기',27],['민수기',36],['신명기',34],['여호수아',24],['사사기',21],['룻기',4],['사무엘상',31],['사무엘하',24],['열왕기상',22],['열왕기하',25],['역대상',29],['역대하',36],['에스라',10],['느헤미야',13],['에스더',10],['욥기',42],['시편',150],['잠언',31],['전도서',12],['아가',8],['이사야',66],['예레미야',52],['예레미야애가',5],['에스겔',48],['다니엘',12],['호세아',14],['요엘',3],['아모스',9],['오바댜',1],['요나',4],['미가',7],['나훔',3],['하박국',3],['스바냐',3],['학개',2],['스가랴',14],['말라기',4],
+['마태복음',28],['마가복음',16],['누가복음',24],['요한복음',21],['사도행전',28],['로마서',16],['고린도전서',16],['고린도후서',13],['갈라디아서',6],['에베소서',6],['빌립보서',4],['골로새서',4],['데살로니가전서',5],['데살로니가후서',3],['디모데전서',6],['디모데후서',4],['디도서',3],['빌레몬서',1],['히브리서',13],['야고보서',5],['베드로전서',5],['베드로후서',3],['요한일서',5],['요한이서',1],['요한삼서',1],['유다서',1],['요한계시록',22]];
+const BOOKMAP = Object.fromEntries(BOOKS);
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: true, autoRefreshToken: true } });
+const S = { user: null, me: null, family: null, members: [], plans: [], tab: 'today', tok: 0, lists: {}, recs: {}, urls: {}, logDays: 14, listenPlan: null, listenWho: '', form: null, avatars: [], avUrl: {} };
+const AV_BUCKET = 'avatars';
+const AV_COLORS = ['#B08A5B', '#7E9A7A', '#7F8FB0', '#B07F8A', '#9A8AB0', '#6F9EA3'];
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const nameOf = uid => S.members.find(m => m.user_id === uid)?.display_name || '(나간 가족)';
+const W = ['일', '월', '화', '수', '목', '금', '토'];
+
+function dateIn(tz, d = new Date()) {
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(d).map(x => [x.type, x.value]));
+  return `${p.year}-${p.month}-${p.day}`;
+}
+const today = () => dateIn(S.family?.timezone || 'Asia/Jakarta');
+const addDays = (ds, n) => new Date(Date.parse(ds + 'T00:00:00Z') + n * 864e5).toISOString().slice(0, 10);
+const daysBetween = (a, b) => Math.round((Date.parse(b + 'T00:00:00Z') - Date.parse(a + 'T00:00:00Z')) / 864e5);
+function fmtDate(ds) { const d = new Date(ds + 'T00:00:00Z'); return `${d.getUTCFullYear()}년 ${d.getUTCMonth() + 1}월 ${d.getUTCDate()}일 (${W[d.getUTCDay()]})`; }
+// 가족 공간이 시작된 날 (이 날 이전 기록은 보여주지 않음)
+function familyStart() {
+  const created = dateIn(S.family.timezone, new Date(S.family.created_at));
+  return S.plans.reduce((m, p) => p.start_date < m ? p.start_date : m, created);
+}
+const fmtTime = iso => new Date(iso).toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit' });
+const fmtDur = s => s ? `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}` : '';
+// 프로필 사진: 올해 사진이 있으면 올해 것, 없으면 가장 최근 연도 사진
+function avatarRow(uid) {
+  const mine = S.avatars.filter(a => a.user_id === uid); if (!mine.length) return null;
+  const y = +today().slice(0, 4);
+  return mine.find(a => a.year === y) || mine.filter(a => a.year <= y).sort((a, b) => b.year - a.year)[0] || mine.sort((a, b) => b.year - a.year)[0];
+}
+function av(uid, cls = '', row) {
+  const a = row || avatarRow(uid), url = a && S.avUrl[a.path];
+  const color = AV_COLORS[[...String(uid)].reduce((s, c) => s + c.charCodeAt(0), 0) % AV_COLORS.length];
+  const ch = esc((nameOf(uid) || '?').trim().charAt(0));
+  return `<span class="av ${cls}" style="--c:${color}">${url ? `<img src="${esc(url)}" alt="" loading="lazy">` : ch}</span>`;
+}
+const who = (uid, cls = 'sm') => `${av(uid, cls)}${esc(nameOf(uid))}`;
+const tzLabel = () => (TZS.find(t => t[0] === S.family?.timezone) || [, S.family?.timezone])[1];
+
+function toast(msg, ms = 2600) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), ms); }
+function errMsg(e) { const m = e?.message || String(e); if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return '인터넷 연결을 확인해 주세요'; return m; }
+const view = h => { $('#app').innerHTML = h; };
+
+// 읽기 일정 계산: 시작일로부터 N일째 → 몇 장, 누구 차례
+function planDay(p, date) {
+  const d = daysBetween(p.start_date, date);
+  if (d < 0) return { before: true };
+  const from = d * p.per_day + 1;
+  if (from > p.chapters) return { after: true };
+  const to = Math.min(p.chapters, from + p.per_day - 1);
+  const order = p.relay_order || [];
+  return { from, to, reader: p.mode === 'relay' && order.length ? order[d % order.length] : null };
+}
+const rangeTxt = st => st.from === st.to ? `${st.from}장` : `${st.from}–${st.to}장`;
+// 전체 일정: 총 며칠, 끝나는 날
+function planSpan(p) { const days = Math.ceil(p.chapters / p.per_day); return { days, end: addDays(p.start_date, days - 1) }; }
+const shortDate = ds => { const d = new Date(ds + 'T00:00:00Z'); return `${d.getUTCMonth() + 1}/${d.getUTCDate()}(${W[d.getUTCDay()]})`; };
+function bookOptions(sel) {
+  const opt = ([b, c]) => `<option value="${b}" ${b === sel ? 'selected' : ''}>${b} (${c}장)</option>`;
+  return `<optgroup label="구약 (39권)">${BOOKS.slice(0, 39).map(opt).join('')}</optgroup><optgroup label="신약 (27권)">${BOOKS.slice(39).map(opt).join('')}</optgroup>`;
+}
+
+// ================= 휴대폰 저장 (업로드 대기열) =================
+const dbp = new Promise((res, rej) => {
+  const r = indexedDB.open('family-bible', 1);
+  r.onupgradeneeded = () => r.result.createObjectStore('queue', { keyPath: 'id' });
+  r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+});
+async function q(mode, fn) {
+  const db = await dbp;
+  return new Promise((res, rej) => { const tx = db.transaction('queue', mode); const rq = fn(tx.objectStore('queue')); tx.oncomplete = () => res(rq && rq.result); tx.onerror = () => rej(tx.error); });
+}
+const qAll = () => q('readonly', s => s.getAll());
+
+let flushing = false;
+async function flushQueue() {
+  if (flushing || !S.user) return;
+  flushing = true; let ok = 0, fail = null;
+  try {
+    for (const it of await qAll()) {
+      if (it.user_id !== S.user.id) continue;
+      try {
+        const path = `${it.family_id}/${it.user_id}/${it.id}.${it.ext}`;
+        const up = await sb.storage.from(BUCKET).upload(path, it.blob, { contentType: it.mime, upsert: true });
+        if (up.error) throw up.error;
+        const ins = await sb.from('recordings').upsert({ id: it.id, family_id: it.family_id, plan_id: it.plan_id, user_id: it.user_id, book: it.book, chapter: it.chapter, read_date: it.read_date, path, duration_sec: it.duration_sec }, { onConflict: 'id', ignoreDuplicates: true });
+        if (ins.error) throw ins.error;
+        await q('readwrite', s => s.delete(it.id)); ok++;
+      } catch (e) { fail = e; break; }
+    }
+  } finally { flushing = false; }
+  if (fail) toast('업로드 실패: ' + errMsg(fail) + ' — 휴대폰에 저장돼 있어 나중에 다시 올려요', 4000);
+  else if (ok) { toast(`녹음 ${ok}개 업로드 완료 ✓`); if (S.tab === 'today' || S.tab === 'log') render(); }
+  updatePending();
+}
+async function updatePending() {
+  const el = $('#pending'); if (!el || !S.user) return;
+  const n = (await qAll()).filter(x => x.user_id === S.user.id).length;
+  el.innerHTML = n ? `<div class="card pending row"><span>⏳ 업로드 대기 ${n}개 (휴대폰에 저장됨)</span><button class="small" data-act="flush">다시 시도</button></div>` : '';
+}
+window.addEventListener('online', flushQueue);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') flushQueue(); });
+
+// ================= 재생 =================
+const audio = $('#audio');
+const P = { list: [], i: 0 };
+async function signUrls(recs) {
+  const now = Date.now();
+  const need = [...new Set(recs.map(r => r.path))].filter(p => !(S.urls[p] && S.urls[p].exp > now));
+  for (let i = 0; i < need.length; i += 100) {
+    const { data, error } = await sb.storage.from(BUCKET).createSignedUrls(need.slice(i, i + 100), 6 * 3600);
+    if (error) { toast('재생 주소 오류: ' + errMsg(error)); return; }
+    for (const d of data) if (d.signedUrl) S.urls[d.path] = { url: d.signedUrl, exp: now + 5 * 3600e3 };
+  }
+}
+function playList(list, i) {
+  P.list = list; playAt(i);
+}
+function playAt(i) {
+  const r = P.list[i]; if (!r) return;
+  const u = S.urls[r.path]; if (!u) { toast('잠시 후 다시 눌러 주세요'); return; }
+  P.i = i; audio.src = u.url;
+  audio.play().catch(e => toast('재생 실패: ' + errMsg(e)));
+  const title = `${r.book} ${r.chapter}장 · ${nameOf(r.user_id)}`;
+  $('#ptitle').textContent = (P.list.length > 1 ? `(${i + 1}/${P.list.length}) ` : '') + title;
+  $('#player').hidden = false;
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({ title, artist: S.family?.name || '가족 성경', artwork: [{ src: 'icon-512.png', sizes: '512x512', type: 'image/png' }] });
+    navigator.mediaSession.setActionHandler('nexttrack', () => playAt(P.i + 1));
+    navigator.mediaSession.setActionHandler('previoustrack', () => playAt(P.i - 1));
+  }
+  document.querySelectorAll('.rec.now').forEach(e => e.classList.remove('now'));
+  document.querySelectorAll(`.rec[data-id="${r.id}"]`).forEach(e => e.classList.add('now'));
+}
+audio.addEventListener('ended', () => { if (P.i + 1 < P.list.length) playAt(P.i + 1); });
+
+function recLine(r, key, i, opts = {}) {
+  S.recs[r.id] = r;
+  const label = opts.short ? who(r.user_id) : `${who(r.user_id)} <span>· ${esc(r.book)} ${r.chapter}장</span>`;
+  return `<div class="rec" data-id="${r.id}"><button class="play" data-act="play" data-list="${key}" data-i="${i}" aria-label="재생">▶</button>
+    <span>${label} <small>${fmtDur(r.duration_sec)}</small></span>
+    ${r.user_id === S.user.id ? `<button class="link" data-act="delrec" data-id="${r.id}">삭제</button>` : ''}</div>`;
+}
+// ---- 좋아요 (메모·감사 공통) ----
+async function loadLikes(kind, ids) {
+  S.likes = (S.likes || []).filter(l => !(l.kind === kind && ids.includes(l.target_id)));
+  if (!ids.length) return;
+  const { data } = await sb.from('likes').select('kind,target_id,user_id').eq('kind', kind).in('target_id', ids);
+  S.likes.push(...(data || []));
+}
+function likeInner(kind, id) {
+  const ls = (S.likes || []).filter(l => l.kind === kind && l.target_id === id), mine = ls.some(l => l.user_id === S.user.id);
+  return `<button class="like ${mine ? 'on' : ''}" data-act="like" data-k="${kind}" data-id="${id}">${mine ? '♥' : '♡'} ${ls.length || ''}</button>
+    ${ls.length ? `<small>${ls.map(l => esc(nameOf(l.user_id))).join(', ')}</small>` : ''}`;
+}
+const likeBox = (kind, id) => `<div class="likes" data-like="${kind}-${id}">${likeInner(kind, id)}</div>`;
+
+function noteHtml(n, showDate) {
+  return `<div class="note"><div class="row"><span class="who">${who(n.user_id)}</span><small>${showDate ? fmtDate(n.read_date) + ' ' : ''}${fmtTime(n.created_at)}</small></div>
+    <p>${esc(n.body)}</p><div class="row">${likeBox('note', n.id)}${n.user_id === S.user.id ? `<button class="link" data-act="delnote" data-id="${n.id}">삭제</button>` : ''}</div></div>`;
+}
+function thankHtml(g, showDate) {
+  return `<div class="note thanks"><div class="row"><span class="who">${who(g.user_id)}</span><small>${showDate ? fmtDate(g.gdate) + ' ' : ''}${fmtTime(g.created_at)}</small></div>
+    <p>${esc(g.body)}</p><div class="row">${likeBox('thanks', g.id)}${g.user_id === S.user.id ? `<button class="link" data-act="delthanks" data-id="${g.id}">삭제</button>` : ''}</div></div>`;
+}
+
+// ================= 시작 · 로그인 =================
+async function boot() {
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return renderAuth();
+  S.user = session.user;
+  await loadFamily();
+}
+sb.auth.onAuthStateChange((ev) => { if (ev === 'SIGNED_OUT') { S.user = null; renderAuth(); } });
+
+function renderAuth(mode = 'login') {
+  $('#tabs').hidden = true; $('#player').hidden = true;
+  view(`<div class="hero"><img src="icon-192.png" alt="" style="width:72px;height:72px;border-radius:20px;box-shadow:var(--shadow)"><h1>가족 성경 읽기</h1><p class="muted" style="margin:0">우리 가족만의 말씀 낭독 공간</p></div>
+  <div class="card">
+    <div class="seg"><label><input type="radio" name="am" value="login" ${mode === 'login' ? 'checked' : ''} data-act="authmode">로그인</label><label><input type="radio" name="am" value="signup" ${mode === 'signup' ? 'checked' : ''} data-act="authmode">처음 가입</label></div>
+    <label>이메일<input id="em" type="email" autocomplete="email" inputmode="email"></label>
+    <label>비밀번호 ${mode === 'signup' ? '(6자 이상)' : ''}<input id="pw" type="password" autocomplete="${mode === 'signup' ? 'new-password' : 'current-password'}"></label>
+    <button data-act="${mode}">${mode === 'login' ? '로그인' : '가입하기'}</button>
+    <p id="aerr" class="muted"></p>
+  </div>`);
+}
+async function doAuth(kind) {
+  const email = $('#em').value.trim(), password = $('#pw').value;
+  if (!email || password.length < 6) { $('#aerr').textContent = '이메일과 6자 이상 비밀번호를 입력해 주세요'; return; }
+  $('#aerr').textContent = '잠시만요…';
+  const { data, error } = kind === 'signup' ? await sb.auth.signUp({ email, password }) : await sb.auth.signInWithPassword({ email, password });
+  if (error) { $('#aerr').textContent = /Invalid login/i.test(error.message) ? '이메일 또는 비밀번호가 맞지 않아요' : /registered/i.test(error.message) ? '이미 가입된 이메일이에요. 로그인해 주세요' : errMsg(error); return; }
+  if (!data.session) { $('#aerr').textContent = '가입은 됐지만 이메일 확인이 켜져 있어요. 관리자에게 알려주세요 (Supabase에서 Confirm email 끄기)'; return; }
+  S.user = data.session.user; await loadFamily();
+}
+
+async function loadFamily() {
+  const { data, error } = await sb.from('members').select('family_id, families(*)').eq('user_id', S.user.id).limit(1);
+  if (error) { view(`<div class="card"><p>불러오기 실패: ${esc(errMsg(error))}</p><button data-act="reload">다시 시도</button></div>`); return; }
+  if (!data.length) return renderOnboard();
+  S.family = data[0].families;
+  await refreshCore();
+  $('#tabs').hidden = false;
+  go(S.tab);
+  flushQueue();
+}
+async function refreshCore() {
+  const [m, p] = await Promise.all([
+    sb.from('members').select('*').eq('family_id', S.family.id).order('joined_at'),
+    sb.from('plans').select('*').eq('family_id', S.family.id).order('created_at')]);
+  S.members = m.data || []; S.plans = p.data || [];
+  S.me = S.members.find(x => x.user_id === S.user.id);
+  const a = await sb.from('avatars').select('*').eq('family_id', S.family.id);
+  S.avatars = a.data || [];
+  const need = S.avatars.map(x => x.path).filter(p => !S.avUrl[p]);
+  if (need.length) {
+    const { data } = await sb.storage.from(AV_BUCKET).createSignedUrls(need, 7 * 24 * 3600);
+    (data || []).forEach(d => { if (d.signedUrl) S.avUrl[d.path] = d.signedUrl; });
+  }
+}
+// 사진을 정사각형 320px JPEG로 줄여서 올림 (용량 약 30KB)
+function shrinkImage(file) {
+  return new Promise((res, rej) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const n = Math.min(img.naturalWidth, img.naturalHeight), c = document.createElement('canvas'); c.width = c.height = 320;
+      c.getContext('2d').drawImage(img, (img.naturalWidth - n) / 2, (img.naturalHeight - n) / 2, n, n, 0, 0, 320, 320);
+      URL.revokeObjectURL(url); c.toBlob(b => b ? res(b) : rej(new Error('변환 실패')), 'image/jpeg', 0.85);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('사진을 읽을 수 없어요')); };
+    img.src = url;
+  });
+}
+async function uploadPhoto(file, year) {
+  toast('사진 올리는 중…');
+  try {
+    const blob = await shrinkImage(file);
+    const path = `${S.family.id}/${S.user.id}/${year}-${Date.now()}.jpg`;
+    const up = await sb.storage.from(AV_BUCKET).upload(path, blob, { contentType: 'image/jpeg' });
+    if (up.error) throw up.error;
+    const old = S.avatars.find(a => a.user_id === S.user.id && a.year === year);
+    const r = await sb.from('avatars').upsert({ family_id: S.family.id, user_id: S.user.id, year, path }, { onConflict: 'family_id,user_id,year' });
+    if (r.error) throw r.error;
+    if (old) await sb.storage.from(AV_BUCKET).remove([old.path]);
+    toast(`${year}년 사진을 저장했어요 📷`); render();
+  } catch (e) { toast('사진 저장 실패: ' + errMsg(e), 4000); }
+}
+
+function renderOnboard() {
+  $('#tabs').hidden = true;
+  view(`<div class="eyebrow" style="margin-top:24px">첫 시작</div><h1>환영해요</h1><p class="muted">가족 공간을 만들거나, 받은 초대 코드로 들어오세요</p>
+  <div class="card"><b>초대 코드로 참여</b>
+    <label>초대 코드 (6자리)<input id="jcode" autocapitalize="characters" maxlength="6"></label>
+    <label>가족에게 보일 내 이름<input id="jname" placeholder="예: 엄마, 준우"></label>
+    <button data-act="join">참여하기</button></div>
+  <div class="card"><b>새 가족 공간 만들기</b> <span class="muted">(가족 중 한 명만)</span>
+    <label>가족 이름<input id="fname" placeholder="예: 우리 가족"></label>
+    <label>가족에게 보일 내 이름<input id="cname" placeholder="예: 엄마"></label>
+    <button class="ghost" data-act="create">만들기</button></div>
+  <p id="oerr" class="muted"></p><button class="link" data-act="logout">로그아웃</button>`);
+}
+
+// ================= 화면 전환 =================
+function go(tab) {
+  S.tab = tab;
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  window.scrollTo(0, 0);
+  render();
+}
+function render() {
+  const tok = ++S.tok;
+  ({ today: renderToday, log: renderLog, listen: renderListen, pray: renderPray, family: renderFamily })[S.tab](tok)
+    .catch(e => { if (tok === S.tok) view(`<div class="card"><p>문제가 생겼어요: ${esc(errMsg(e))}</p><button data-act="rerender">다시 시도</button></div>`); });
+}
+const must = r => { if (r.error) throw r.error; return r.data || []; };
+
+// ---------- 오늘 ----------
+async function renderToday(tok) {
+  const t = today(), fid = S.family.id, active = S.plans.filter(p => !p.archived);
+  const [recs, notes, prog, thanks] = await Promise.all([
+    sb.from('recordings').select('*').eq('family_id', fid).eq('read_date', t).order('created_at').then(must),
+    sb.from('notes').select('*').eq('family_id', fid).eq('read_date', t).order('created_at').then(must),
+    active.length ? sb.from('recordings').select('plan_id,chapter').in('plan_id', active.map(p => p.id)).then(must) : [],
+    sb.from('gratitudes').select('*').eq('family_id', fid).eq('gdate', t).order('created_at').then(must)]);
+  await Promise.all([signUrls(recs), loadLikes('note', notes.map(n => n.id)), loadLikes('thanks', thanks.map(g => g.id))]);
+  if (tok !== S.tok) return;
+  let h = `<div class="row" style="align-items:flex-end"><div><div class="eyebrow">${esc(S.family.name)} · ${esc(tzLabel())} 기준</div><h1>${fmtDate(t)}</h1></div>${av(S.user.id, 'lg')}</div><div id="pending"></div>`;
+  if (!active.length) h += `<div class="card"><p>아직 읽고 있는 책이 없어요.</p><button data-act="newplan">📚 첫 책 시작하기</button></div>`;
+  for (const p of active) {
+    const st = planDay(p, t);
+    const done = new Set(prog.filter(x => x.plan_id === p.id).map(x => x.chapter)).size;
+    const mine = recs.filter(r => r.plan_id === p.id);
+    const key = 'today-' + p.id; S.lists[key] = mine;
+    let info = '';
+    if (st.before) info = `<p>${fmtDate(p.start_date)}에 시작해요</p>`;
+    else if (st.after) info = `<p>일정이 끝났어요. 빠진 장이 있으면 장을 골라 녹음할 수 있어요.</p>`;
+    else {
+      info = `<p class="big">오늘: ${esc(p.book)} ${rangeTxt(st)}</p>`;
+      if (p.mode === 'relay' && st.reader) info += st.reader === S.user.id ? `<p class="turn">오늘은 내 차례예요 🙌</p>` : `<p class="who" style="margin:6px 0;font-weight:500">오늘 차례 ${av(st.reader)}<b>${esc(nameOf(st.reader))}</b></p>`;
+      if (p.mode === 'together') info += `<div>${S.members.map(m => { const d = mine.some(r => r.user_id === m.user_id); return `<span class="chip ${d ? 'on' : ''}">${av(m.user_id, 'sm')}${esc(m.display_name)}${d ? ' ✓' : ''}</span>`; }).join('')}</div>`;
+    }
+    const defCh = st.from || (st.after ? p.chapters : 1);
+    const sp = planSpan(p), dayN = daysBetween(p.start_date, t) + 1;
+    const spanTxt = `<p class="muted" style="margin:2px 0">${st.from ? `${dayN}일째 / 총 ${sp.days}일 · ` : `총 ${sp.days}일 · `}${shortDate(p.start_date)} ~ ${shortDate(sp.end)}</p>`;
+    h += `<div class="card"><div class="row"><span class="title">${esc(p.book)}</span><span class="badge">${p.mode === 'relay' ? '🔁 릴레이' : '👥 함께 읽기'}</span></div>${spanTxt}${info}
+      <button class="link" data-act="schedule" data-id="${p.id}" style="padding-left:0">📅 전체 일정표 보기</button>
+      <div class="bar"><i style="width:${(done / p.chapters * 100).toFixed(1)}%"></i></div>
+      <p class="muted" style="margin:4px 0 6px">${done} / ${p.chapters}장 녹음됨${done >= p.chapters ? ' · <span class="done">완독! 🎉</span>' : ''}</p>
+      ${mine.map((r, i) => recLine(r, key, i)).join('')}
+      <button data-act="rec" data-plan="${p.id}" data-ch="${defCh}">🎙 녹음하기</button></div>`;
+  }
+  h += `<h2>오늘의 느낀 점 · 기도 메모</h2><div class="card" style="padding-top:6px">${notes.map(n => noteHtml(n)).join('') || '<p class="muted">아직 메모가 없어요</p>'}
+    <textarea id="noteText" rows="3" placeholder="오늘 말씀에서 느낀 점이나 기도를 적어 보세요"></textarea>
+    <button data-act="savenote">메모 남기기</button></div>`;
+  h += `<h2>오늘의 감사</h2><div class="card" style="padding-top:6px">${thanks.map(g => thankHtml(g)).join('') || '<p class="muted">오늘 감사한 일을 나눠 주세요</p>'}
+    <textarea id="thanksText" rows="2" placeholder="오늘 감사한 일 한 가지"></textarea>
+    <button data-act="savethanks">감사 남기기</button></div>`;
+  view(h); updatePending();
+}
+
+// ---------- 날짜별 기록 ----------
+const logTabs = () => `<div class="seg" style="margin:12px 0 4px">
+  <label><input type="radio" name="lm" value="date" data-act="logmode" ${S.logMode !== 'thanks' ? 'checked' : ''}>🗓 날짜별</label>
+  <label><input type="radio" name="lm" value="thanks" data-act="logmode" ${S.logMode === 'thanks' ? 'checked' : ''}>💛 감사 모음</label></div>`;
+async function renderLog(tok) {
+  if (S.logMode === 'thanks') return renderThanks(tok);
+  const t = today(), start = familyStart(), total = Math.max(1, daysBetween(start, t) + 1);
+  const days = Math.min(S.logDays, total), from = addDays(t, -(days - 1)), fid = S.family.id;
+  const [recs, notes, thanks] = await Promise.all([
+    sb.from('recordings').select('*').eq('family_id', fid).gte('read_date', from).order('created_at').then(must),
+    sb.from('notes').select('*').eq('family_id', fid).gte('read_date', from).order('created_at').then(must),
+    sb.from('gratitudes').select('*').eq('family_id', fid).gte('gdate', from).order('created_at').then(must)]);
+  await Promise.all([signUrls(recs), loadLikes('note', notes.map(n => n.id)), loadLikes('thanks', thanks.map(g => g.id))]);
+  if (tok !== S.tok) return;
+  let h = `<div class="eyebrow">누가 녹음하고 어떤 글을 남겼는지</div><h1>기록</h1>${logTabs()}<div id="pending"></div>`;
+  for (let i = 0; i < days; i++) {
+    const d = addDays(t, -i), dr = recs.filter(r => r.read_date === d), dn = notes.filter(n => n.read_date === d), dg = thanks.filter(g => g.gdate === d);
+    const key = 'log-' + d; S.lists[key] = dr;
+    const did = uid => dr.some(r => r.user_id === uid) || dn.some(n => n.user_id === uid) || dg.some(g => g.user_id === uid);
+    h += `<div class="card"><div class="row"><span class="title" style="font-family:var(--serif)">${fmtDate(d)}</span>${i === 0 ? '<span class="badge">오늘</span>' : ''}</div>
+      <div style="margin:6px 0">${S.members.map(m => `<span class="chip ${did(m.user_id) ? 'on' : ''}">${av(m.user_id, 'sm')}${esc(m.display_name)}${did(m.user_id) ? ' ✓' : ''}</span>`).join('')}</div>
+      ${dr.map((r, j) => recLine(r, key, j)).join('')}${dn.map(n => noteHtml(n)).join('')}
+      ${dg.length ? `<div class="sub">💛 감사</div>${dg.map(g => thankHtml(g)).join('')}` : ''}
+      ${!dr.length && !dn.length && !dg.length ? '<p class="muted" style="margin:0">기록 없음</p>' : ''}</div>`;
+  }
+  h += days < total ? `<button class="ghost" data-act="more">이전 2주 더 보기</button>` : `<p class="muted center">${fmtDate(start)} 가족 공간 시작 🌱</p>`;
+  view(h); updatePending();
+}
+
+// ---------- 감사 모음 (월별 · 사람별) ----------
+async function renderThanks(tok) {
+  const t = today(), fid = S.family.id, startM = familyStart().slice(0, 7), nowM = t.slice(0, 7);
+  const months = []; for (let m = nowM; m >= startM; m = prevMonth(m)) months.push(m);
+  if (!months.includes(S.thanksMonth)) S.thanksMonth = nowM;
+  const m = S.thanksMonth, next = nextMonth(m);
+  let q2 = sb.from('gratitudes').select('*').eq('family_id', fid).gte('gdate', m + '-01').lt('gdate', next + '-01').order('gdate', { ascending: false }).order('created_at');
+  const all = await q2.then(must);
+  const list = S.thanksWho ? all.filter(g => g.user_id === S.thanksWho) : all;
+  await loadLikes('thanks', list.map(g => g.id));
+  if (tok !== S.tok) return;
+  const mLabel = x => `${x.slice(0, 4)}년 ${+x.slice(5)}월`;
+  let h = `<div class="eyebrow">누가 녹음하고 어떤 글을 남겼는지</div><h1>기록</h1>${logTabs()}
+  <div class="card"><div class="row" style="gap:10px">
+    <select data-act="tmonth" style="margin:0">${months.map(x => `<option value="${x}" ${x === m ? 'selected' : ''}>${mLabel(x)}</option>`).join('')}</select>
+    <select data-act="twho" style="margin:0"><option value="">가족 모두</option>${S.members.map(x => `<option value="${x.user_id}" ${x.user_id === S.thanksWho ? 'selected' : ''}>${esc(x.display_name)}</option>`).join('')}</select></div>
+    <p class="muted" style="margin:14px 0 6px">${mLabel(m)} 감사 ${all.length}개</p>
+    <div>${S.members.map(x => `<span class="chip ${all.some(g => g.user_id === x.user_id) ? 'on' : ''}">${av(x.user_id, 'sm')}${esc(x.display_name)} ${all.filter(g => g.user_id === x.user_id).length}</span>`).join('')}</div></div>`;
+  if (!list.length) h += `<p class="muted center" style="margin-top:30px">이 달에는 아직 감사가 없어요</p>`;
+  let last = '';
+  for (const g of list) {
+    if (g.gdate !== last) { if (last) h += `</div>`; h += `<h2>${fmtDate(g.gdate)}</h2><div class="card" style="padding-top:4px">`; last = g.gdate; }
+    h += thankHtml(g);
+  }
+  if (last) h += `</div>`;
+  view(h);
+}
+const nextMonth = m => { let [y, mo] = m.split('-').map(Number); mo++; if (mo > 12) { mo = 1; y++; } return `${y}-${String(mo).padStart(2, '0')}`; };
+const prevMonth = m => { let [y, mo] = m.split('-').map(Number); mo--; if (mo < 1) { mo = 12; y--; } return `${y}-${String(mo).padStart(2, '0')}`; };
+
+// ---------- 이어 듣기 ----------
+async function renderListen(tok) {
+  const plans = [...S.plans].reverse();
+  if (!plans.length) { view(`<h1>이어 듣기</h1><div class="card"><p class="muted">아직 읽기 계획이 없어요</p></div>`); return; }
+  if (!plans.some(p => p.id === S.listenPlan)) S.listenPlan = plans[0].id;
+  const p = plans.find(x => x.id === S.listenPlan);
+  const recs = await sb.from('recordings').select('*').eq('plan_id', p.id).order('chapter').order('created_at').then(must);
+  await signUrls(recs);
+  if (tok !== S.tok) return;
+  const list = S.listenWho ? recs.filter(r => r.user_id === S.listenWho) : recs;
+  const key = 'listen'; S.lists[key] = list;
+  const covered = new Set(recs.map(r => r.chapter)).size;
+  const readers = [...new Set(recs.map(r => r.user_id))];
+  let h = `<div class="eyebrow">장 순서대로 자동으로 이어서 재생돼요</div><h1>이어 듣기</h1>
+  <div class="card"><label style="margin-top:0">책<select data-act="lplan">${plans.map(x => `<option value="${x.id}" ${x.id === p.id ? 'selected' : ''}>${esc(x.book)} (${x.mode === 'relay' ? '릴레이' : '함께'}${x.archived ? ', 끝남' : ''})</option>`).join('')}</select></label>
+    <label>누구 목소리<select data-act="lwho"><option value="">모두</option>${readers.map(u => `<option value="${u}" ${u === S.listenWho ? 'selected' : ''}>${esc(nameOf(u))}</option>`).join('')}</select></label>
+    <p style="margin:12px 0 0">${covered >= p.chapters ? `<span class="done">🎉 ${esc(p.book)} 완독!</span>` : `${covered} / ${p.chapters}장 녹음됨`}</p>
+    <button data-act="play" data-list="${key}" data-i="0" ${list.length ? '' : 'disabled'}>▶ 1장부터 이어 듣기 (${list.length}개)</button></div>`;
+  let i = 0, body = '';
+  for (let ch = 1; ch <= p.chapters; ch++) {
+    const rs = list.filter(r => r.chapter === ch);
+    if (!rs.length) { body += `<div class="rec"><span class="muted">${ch}장 — 아직 없음</span></div>`; continue; }
+    body += `<div style="padding-top:8px"><b>${ch}장</b></div>` + rs.map(r => recLine(r, key, i++, { short: true })).join('');
+  }
+  view(h + `<div class="card">${body}</div>`);
+}
+
+// ---------- 기도 ----------
+async function renderPray(tok) {
+  const fid = S.family.id, t = today();
+  const [prs, marks] = await Promise.all([
+    sb.from('prayers').select('*').eq('family_id', fid).order('created_at', { ascending: false }).then(must),
+    sb.from('prayer_marks').select('prayer_id,user_id,prayed_on').eq('family_id', fid).then(must)]);
+  if (tok !== S.tok) return;
+  const card = pr => {
+    const ms = marks.filter(m => m.prayer_id === pr.id), todayMs = ms.filter(m => m.prayed_on === t);
+    const mine = todayMs.some(m => m.user_id === S.user.id), own = pr.user_id === S.user.id;
+    return `<div class="card"><div class="row"><span class="who">${who(pr.user_id, '')}</span><small>${fmtDate(dateIn(S.family.timezone, new Date(pr.created_at)))}</small></div>
+      <p style="white-space:pre-wrap;word-break:break-word;font-family:var(--serif);font-size:17px;line-height:1.7;margin:12px 0 4px">${esc(pr.body)}</p>
+      ${pr.answered ? '<p class="done" style="font-size:15px">✨ 응답받았어요</p>' : `<button class="${mine ? 'ghost' : ''}" data-act="mark" data-id="${pr.id}" data-on="${mine ? 1 : 0}">${mine ? '✓ 오늘 기도했어요' : '🙏 기도했어요'}</button>`}
+      <p class="muted" style="margin:8px 0 0">${todayMs.length ? '오늘: ' + todayMs.map(m => esc(nameOf(m.user_id))).join(', ') + ' · ' : ''}함께 기도한 횟수 ${ms.length}번</p>
+      ${own ? `<div class="row" style="justify-content:flex-end"><button class="link" data-act="answer" data-id="${pr.id}" data-v="${pr.answered ? 0 : 1}">${pr.answered ? '응답 표시 취소' : '응답받음으로 표시'}</button><button class="link" data-act="delpray" data-id="${pr.id}">삭제</button></div>` : ''}</div>`;
+  };
+  const open = prs.filter(p => !p.answered), done = prs.filter(p => p.answered);
+  view(`<div class="eyebrow">서로의 기도제목을 올리고 함께 기도해요</div><h1>기도제목</h1>
+  <div class="card"><textarea id="prayText" rows="3" placeholder="기도제목을 적어 주세요"></textarea><button data-act="addpray">기도제목 올리기</button></div>
+  ${open.map(card).join('') || '<p class="muted">아직 기도제목이 없어요</p>'}
+  ${done.length ? `<h2>✨ 응답받은 기도 (${done.length})</h2>${done.map(card).join('')}` : ''}`);
+}
+
+// ---------- 가족 · 설정 ----------
+async function renderFamily(tok) {
+  await refreshCore();
+  if (tok !== S.tok) return;
+  const t = today();
+  const plans = S.plans.filter(p => !p.archived), old = S.plans.filter(p => p.archived);
+  const planCard = p => {
+    const st = planDay(p, t);
+    return `<div class="card"><div class="row"><b>${esc(p.book)} (${p.chapters}장)</b><span class="badge">${p.mode === 'relay' ? '🔁 릴레이' : '👥 함께 읽기'}</span></div>
+    <p class="muted" style="margin:6px 0">${shortDate(p.start_date)} ~ ${shortDate(planSpan(p).end)} · 하루 ${p.per_day}장 · 총 ${planSpan(p).days}일 · ${st.before ? '시작 전' : st.after ? '일정 끝' : '오늘 ' + rangeTxt(st)}
+    ${p.mode === 'relay' ? '<br>순서: ' + p.relay_order.map(u => esc(nameOf(u))).join(' → ') : ''}</p>
+    <div class="row" style="justify-content:flex-end"><button class="link" data-act="schedule" data-id="${p.id}">일정표</button>${p.archived ?`<button class="link" data-act="unarchive" data-id="${p.id}">다시 진행</button>` : `<button class="link" data-act="editplan" data-id="${p.id}">수정</button><button class="link" data-act="archive" data-id="${p.id}">끝내기</button>`}<button class="link" data-act="delplan" data-id="${p.id}">삭제</button></div></div>`;
+  };
+  view(`<div class="eyebrow">우리 가족 공간</div><h1>${esc(S.family.name)}</h1>
+  <div class="card center"><b>초대 코드</b><div class="code">${esc(S.family.invite_code)}</div>
+    <p class="muted" style="margin:0">가족에게 앱 주소와 이 코드를 보내 주세요</p><button data-act="share">초대 보내기</button></div>
+  <h2>📚 읽기 계획</h2>${plans.map(planCard).join('') || '<p class="muted">진행 중인 책이 없어요</p>'}
+  <button data-act="newplan">+ 새 책 시작하기</button>
+  ${old.length ? `<h2>끝난 책</h2>${old.map(planCard).join('')}` : ''}
+  <h2>내 프로필</h2><div class="card">
+    <div class="row" style="justify-content:flex-start;gap:16px">${av(S.user.id, 'xl')}<div><div class="title">${esc(S.me?.display_name)}</div><div class="muted">해마다 사진을 바꿔 얼굴 변화를 함께 남겨요</div></div></div>
+    <label>몇 년도 사진인가요?<select id="pyear">${Array.from({ length: 30 }, (_, i) => +today().slice(0, 4) - i).map(y => `<option value="${y}">${y}년</option>`).join('')}</select></label>
+    <input type="file" id="photo" accept="image/*" hidden data-act="photo">
+    <button data-act="pickphoto">📷 사진 고르기</button>
+    <label>내 이름 바꾸기<input id="myname" value="${esc(S.me?.display_name)}"></label><button class="ghost" data-act="rename">이름 저장</button></div>
+  <h2>얼굴 앨범 · 가족 ${S.members.length}명</h2><div class="card">${S.members.map(m => {
+    const rows = S.avatars.filter(a => a.user_id === m.user_id).sort((a, b) => b.year - a.year), mine = m.user_id === S.user.id;
+    return `<div style="padding:10px 0;border-top:1px solid var(--line)"><div class="who" style="margin-bottom:8px">${esc(m.display_name)}${mine ? ' <small>(나)</small>' : ''}</div>
+      <div class="album">${rows.length ? rows.map(a => `<figure>${av(m.user_id, 'xl', a)}<figcaption>${a.year}</figcaption>${mine ? `<button class="x" data-act="delphoto" data-y="${a.year}" aria-label="삭제">✕</button>` : ''}</figure>`).join('') : `<figure>${av(m.user_id, 'xl')}<figcaption>사진 없음</figcaption></figure>`}</div></div>`;
+  }).join('')}</div>
+  <h2>기준 시간대</h2><div class="card"><p class="muted" style="margin:0">"오늘"과 릴레이 순서를 어느 나라 날짜로 정할지 골라요. 시간 표시는 각자 휴대폰 시간으로 보여요.</p>
+    <select data-act="tz">${TZS.map(([v, l]) => `<option value="${v}" ${v === S.family.timezone ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+  <h2>홈 화면에 앱 설치</h2><div class="card"><p style="margin:0">🍎 <b>아이폰</b>: 사파리 아래 공유 버튼(□↑) → <b>홈 화면에 추가</b><br>🤖 <b>안드로이드</b>: 크롬 오른쪽 위 ⋮ → <b>홈 화면에 추가</b> 또는 <b>앱 설치</b></p>
+    ${installEvt ? '<button data-act="install">지금 설치하기</button>' : ''}</div>
+  <button class="ghost" data-act="logout" style="margin-top:24px">로그아웃</button>
+  <p class="muted center">${esc(S.user.email)}<br>앱 버전 ${APP_VERSION}</p>`);
+}
+
+// ---------- 책 계획 만들기 / 수정 ----------
+function openPlanForm(plan) {
+  const order = plan ? [...plan.relay_order.map(id => ({ id, on: true })), ...S.members.filter(m => !plan.relay_order.includes(m.user_id)).map(m => ({ id: m.user_id, on: false }))]
+                     : S.members.map(m => ({ id: m.user_id, on: true }));
+  S.form = { id: plan?.id, order };
+  sheet(`<h2 style="margin-top:0">${plan ? '읽기 계획 수정' : '새 책 시작하기'}</h2>
+    <label>책<select id="fbook">${bookOptions(plan?.book || '창세기')}</select></label>
+    <label>읽는 방식</label><div class="seg">
+      <label><input type="radio" name="fmode" value="relay" ${plan?.mode !== 'together' ? 'checked' : ''}>🔁 릴레이<br><small>하루 한 명씩 돌아가며</small></label>
+      <label><input type="radio" name="fmode" value="together" ${plan?.mode === 'together' ? 'checked' : ''}>👥 함께 읽기<br><small>모두 같은 장</small></label></div>
+    <label>시작일<input id="fstart" type="date" value="${plan?.start_date || today()}"></label>
+    <label>하루에 읽을 장 수<input id="fper" type="number" min="1" max="10" value="${plan?.per_day || 1}"></label>
+    <div class="card" id="fpreview" style="margin-top:14px"></div>
+    <label>릴레이 순서 (릴레이일 때만 사용)</label><div id="forder"></div>
+    <button data-act="saveplan">${plan ? '저장' : '시작하기'}</button><button class="ghost" data-act="closesheet">취소</button>`);
+  drawOrder();
+  ['fbook', 'fper', 'fstart'].forEach(id => { $('#' + id).addEventListener('input', planPreview); $('#' + id).addEventListener('change', planPreview); });
+  planPreview();
+}
+// 선택한 책·속도로 일정 미리보기: "로마서 16장 · 하루 1장 → 16일간"
+function planPreview() {
+  const book = $('#fbook').value, ch = BOOKMAP[book], per = Math.max(1, Math.min(10, +$('#fper').value || 1)), start = $('#fstart').value;
+  if (!start) { $('#fpreview').innerHTML = '<span class="muted">시작일을 골라 주세요</span>'; return; }
+  const sp = planSpan({ chapters: ch, per_day: per, start_date: start });
+  $('#fpreview').innerHTML = `<b>${esc(book)}</b> 전체 ${ch}장 · 하루 ${per}장<br>→ <b>${sp.days}일간</b> · ${fmtDate(start)} ~ ${fmtDate(sp.end)}`;
+}
+// 전체 일정표: 날짜별 읽을 장과 릴레이 차례
+async function openSchedule(id) {
+  const p = S.plans.find(x => x.id === id); if (!p) return;
+  const { data } = await sb.from('recordings').select('chapter').eq('plan_id', p.id);
+  const done = new Set((data || []).map(r => r.chapter)), t = today(), sp = planSpan(p);
+  let rows = '';
+  for (let d = 0; d < sp.days; d++) {
+    const date = addDays(p.start_date, d), st = planDay(p, date);
+    const chs = Array.from({ length: st.to - st.from + 1 }, (_, i) => st.from + i), ok = chs.every(c => done.has(c));
+    rows += `<div class="order" style="${date === t ? 'background:var(--accent2);border-radius:8px;padding:6px' : ''}">
+      <span style="flex:none;width:72px" class="muted">${shortDate(date)}</span>
+      <span>${rangeTxt(st)}${st.reader ? ` · ${esc(nameOf(st.reader))}` : ''}${date === t ? ' <b>← 오늘</b>' : ''}</span>${ok ? '<span class="chip on" style="flex:none">✓</span>' : ''}</div>`;
+  }
+  sheet(`<h2 style="margin-top:0">📅 ${esc(p.book)} 일정표</h2>
+    <p class="muted" style="margin:0 0 8px">${p.chapters}장 · 하루 ${p.per_day}장 · 총 ${sp.days}일 (${fmtDate(p.start_date)} ~ ${fmtDate(sp.end)})</p>
+    ${rows}<button class="ghost" data-act="closesheet">닫기</button>`);
+}
+function drawOrder() {
+  $('#forder').innerHTML = S.form.order.map((o, i) => `<div class="order ${o.on ? '' : 'off'}"><input type="checkbox" style="width:auto;margin:0" data-act="otoggle" data-i="${i}" ${o.on ? 'checked' : ''}>
+    <span>${o.on ? S.form.order.slice(0, i + 1).filter(x => x.on).length + '. ' : ''}${esc(nameOf(o.id))}</span>
+    <button class="small ghost" data-act="oup" data-i="${i}" ${i ? '' : 'disabled'}>↑</button><button class="small ghost" data-act="odown" data-i="${i}" ${i < S.form.order.length - 1 ? '' : 'disabled'}>↓</button></div>`).join('');
+}
+async function savePlan() {
+  const book = $('#fbook').value, mode = document.querySelector('input[name=fmode]:checked').value;
+  const start_date = $('#fstart').value, per_day = Math.max(1, Math.min(10, +$('#fper').value || 1));
+  const relay_order = S.form.order.filter(o => o.on).map(o => o.id);
+  if (!start_date) return toast('시작일을 골라 주세요');
+  if (mode === 'relay' && !relay_order.length) return toast('릴레이에 참여할 사람을 한 명 이상 골라 주세요');
+  const row = { family_id: S.family.id, book, chapters: BOOKMAP[book], mode, start_date, per_day, relay_order };
+  const r = S.form.id ? await sb.from('plans').update(row).eq('id', S.form.id) : await sb.from('plans').insert(row);
+  if (r.error) return toast('저장 실패: ' + errMsg(r.error));
+  closeSheet(); await refreshCore(); toast(S.form.id ? '수정했어요' : `${book} 시작! 📖`); go(S.form.id ? 'family' : 'today');
+}
+
+// ================= 녹음 =================
+const MIMES = ['audio/mp4;codecs=mp4a.40.2', 'audio/mp4', 'audio/webm;codecs=opus', 'audio/webm'];
+const R = { rec: null, stream: null, chunks: [], start: 0, timer: null, lock: null, plan: null };
+function sheet(h) { $('#sheet').innerHTML = `<div class="sheet-bg"><div class="sheet">${h}</div></div>`; }
+function closeSheet() { $('#sheet').innerHTML = ''; }
+
+function openRecorder(planId, ch) {
+  const p = S.plans.find(x => x.id === planId); R.plan = p;
+  sheet(`<h2 style="margin-top:0">🎙 ${esc(p.book)} 녹음</h2>
+    <label>몇 장을 읽나요?<select id="rch">${Array.from({ length: p.chapters }, (_, i) => `<option value="${i + 1}" ${i + 1 === ch ? 'selected' : ''}>${i + 1}장</option>`).join('')}</select></label>
+    <div class="timer" id="rtime">0:00</div>
+    <button class="recbtn" id="rbtn" data-act="rectoggle">● 시작</button>
+    <p class="muted center">녹음하는 동안 화면을 끄거나 다른 앱으로 가지 마세요.<br>정지하면 휴대폰에 먼저 저장되고 자동으로 올라가요.</p>
+    <button class="ghost" id="rclose" data-act="closesheet">닫기</button>`);
+}
+async function recToggle() {
+  if (R.rec && R.rec.state === 'recording') return recStop();
+  try {
+    R.stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } });
+  } catch (e) { toast('마이크를 쓸 수 없어요. 설정에서 마이크 권한을 허용해 주세요', 4500); return; }
+  const mime = MIMES.find(m => window.MediaRecorder && MediaRecorder.isTypeSupported(m));
+  const opt = { audioBitsPerSecond: 48000 }; if (mime) opt.mimeType = mime;
+  R.rec = new MediaRecorder(R.stream, opt); R.chunks = [];
+  R.rec.ondataavailable = e => { if (e.data.size) R.chunks.push(e.data); };
+  R.rec.onstop = recSave;
+  R.rec.start(1000); R.start = Date.now();
+  try { R.lock = await navigator.wakeLock?.request('screen'); } catch (e) {}
+  $('#rbtn').classList.add('on'); $('#rbtn').textContent = '■ 정지'; $('#rclose').disabled = true; $('#rch').disabled = true;
+  R.timer = setInterval(() => { $('#rtime').textContent = fmtDur(Math.round((Date.now() - R.start) / 1000)) || '0:00'; }, 500);
+}
+function recStop() {
+  clearInterval(R.timer); R.rec.stop(); R.stream.getTracks().forEach(t => t.stop());
+  try { R.lock?.release(); } catch (e) {}
+}
+async function recSave() {
+  const secs = Math.round((Date.now() - R.start) / 1000);
+  const chapter = +$('#rch').value; closeSheet();
+  if (secs < 2) return toast('너무 짧아서 저장하지 않았어요');
+  const type = R.rec.mimeType || 'audio/mp4', mime = type.split(';')[0];
+  const item = { id: crypto.randomUUID(), user_id: S.user.id, family_id: S.family.id, plan_id: R.plan.id, book: R.plan.book, chapter,
+    read_date: today(), duration_sec: secs, mime, ext: mime.includes('webm') ? 'webm' : 'm4a', blob: new Blob(R.chunks, { type: mime }) };
+  try { await q('readwrite', s => s.put(item)); }
+  catch (e) { toast('휴대폰 저장 실패: ' + errMsg(e)); return; }
+  toast('휴대폰에 저장했어요. 올리는 중…');
+  updatePending(); flushQueue();
+}
+
+// ================= 버튼 동작 =================
+let installEvt = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; });
+
+const ACT = {
+  tab: d => go(d.tab), rerender: () => render(), reload: () => location.reload(),
+  authmode: (d, el) => renderAuth(el.value), login: () => doAuth('login'), signup: () => doAuth('signup'),
+  logout: async () => { await sb.auth.signOut(); location.reload(); },
+  join: async () => {
+    const code = $('#jcode').value.trim(), name = $('#jname').value.trim();
+    if (!code || !name) return $('#oerr').textContent = '초대 코드와 이름을 입력해 주세요';
+    const { error } = await sb.rpc('join_family', { code, my_name: name });
+    if (error) return $('#oerr').textContent = errMsg(error);
+    loadFamily();
+  },
+  create: async () => {
+    const f = $('#fname').value.trim(), name = $('#cname').value.trim();
+    if (!f || !name) return $('#oerr').textContent = '가족 이름과 내 이름을 입력해 주세요';
+    const { error } = await sb.rpc('create_family', { fname: f, my_name: name });
+    if (error) return $('#oerr').textContent = errMsg(error);
+    S.tab = 'family'; loadFamily();
+  },
+  play: d => playList(S.lists[d.list], +d.i),
+  prev: () => playAt(Math.max(0, P.i - 1)), next: () => playAt(P.i + 1),
+  pclose: () => { audio.pause(); $('#player').hidden = true; },
+  rec: d => openRecorder(d.plan, +d.ch), rectoggle: () => recToggle(), closesheet: closeSheet,
+  flush: () => flushQueue(),
+  delrec: async d => {
+    const r = S.recs[d.id]; if (!r || !confirm(`${r.book} ${r.chapter}장 녹음을 삭제할까요?\n되돌릴 수 없어요.`)) return;
+    await sb.storage.from(BUCKET).remove([r.path]);
+    const { error } = await sb.from('recordings').delete().eq('id', r.id);
+    if (error) return toast('삭제 실패: ' + errMsg(error));
+    toast('삭제했어요'); render();
+  },
+  savenote: async () => {
+    const body = $('#noteText').value.trim(); if (!body) return;
+    const { error } = await sb.from('notes').insert({ family_id: S.family.id, user_id: S.user.id, read_date: today(), body });
+    if (error) return toast('저장 실패: ' + errMsg(error));
+    render();
+  },
+  delnote: async d => { if (!confirm('메모를 삭제할까요?')) return; await sb.from('notes').delete().eq('id', d.id); render(); },
+  more: () => { S.logDays += 14; render(); },
+  logmode: (d, el) => { S.logMode = el.value; render(); },
+  tmonth: (d, el) => { S.thanksMonth = el.value; render(); },
+  twho: (d, el) => { S.thanksWho = el.value; render(); },
+  savethanks: async () => {
+    const body = $('#thanksText').value.trim(); if (!body) return;
+    const { error } = await sb.from('gratitudes').insert({ family_id: S.family.id, user_id: S.user.id, gdate: today(), body });
+    if (error) return toast('저장 실패: ' + errMsg(error));
+    toast('감사를 남겼어요 💛'); render();
+  },
+  delthanks: async d => { if (!confirm('감사를 삭제할까요?')) return; await sb.from('gratitudes').delete().eq('id', d.id); render(); },
+  like: async (d, el) => {
+    if (el.dataset.busy) return; el.dataset.busy = 1;
+    const mine = (S.likes || []).some(l => l.kind === d.k && l.target_id === d.id && l.user_id === S.user.id);
+    const r = mine ? await sb.from('likes').delete().match({ kind: d.k, target_id: d.id, user_id: S.user.id })
+                   : await sb.from('likes').insert({ kind: d.k, target_id: d.id, family_id: S.family.id, user_id: S.user.id });
+    if (r.error) { delete el.dataset.busy; return toast(errMsg(r.error)); }
+    if (mine) S.likes = S.likes.filter(l => !(l.kind === d.k && l.target_id === d.id && l.user_id === S.user.id));
+    else S.likes.push({ kind: d.k, target_id: d.id, user_id: S.user.id });
+    document.querySelectorAll(`[data-like="${d.k}-${d.id}"]`).forEach(b => b.innerHTML = likeInner(d.k, d.id));
+  },
+  lplan: (d, el) => { S.listenPlan = el.value; S.listenWho = ''; render(); },
+  lwho: (d, el) => { S.listenWho = el.value; render(); },
+  addpray: async () => {
+    const body = $('#prayText').value.trim(); if (!body) return;
+    const { error } = await sb.from('prayers').insert({ family_id: S.family.id, user_id: S.user.id, body });
+    if (error) return toast('저장 실패: ' + errMsg(error));
+    render();
+  },
+  mark: async d => {
+    const t = today();
+    const r = d.on === '1' ? await sb.from('prayer_marks').delete().match({ prayer_id: d.id, user_id: S.user.id, prayed_on: t })
+                           : await sb.from('prayer_marks').insert({ prayer_id: d.id, family_id: S.family.id, user_id: S.user.id, prayed_on: t });
+    if (r.error) return toast(errMsg(r.error));
+    render();
+  },
+  answer: async d => { await sb.from('prayers').update({ answered: d.v === '1' }).eq('id', d.id); render(); },
+  delpray: async d => { if (!confirm('기도제목을 삭제할까요?')) return; await sb.from('prayers').delete().eq('id', d.id); render(); },
+  share: async () => {
+    const text = `우리 가족 성경 읽기 앱에 초대해요 📖\n주소: ${location.origin}\n초대 코드: ${S.family.invite_code}\n\n1) 주소를 열고 '처음 가입'\n2) 초대 코드와 내 이름 입력`;
+    try { if (navigator.share) await navigator.share({ text }); else { await navigator.clipboard.writeText(text); toast('초대 문구를 복사했어요'); } } catch (e) {}
+  },
+  rename: async () => {
+    const n = $('#myname').value.trim(); if (!n) return;
+    const { error } = await sb.from('members').update({ display_name: n }).match({ family_id: S.family.id, user_id: S.user.id });
+    if (error) return toast(errMsg(error));
+    toast('저장했어요'); render();
+  },
+  tz: async (d, el) => {
+    const { error } = await sb.from('families').update({ timezone: el.value }).eq('id', S.family.id);
+    if (error) return toast(errMsg(error));
+    S.family.timezone = el.value; toast('기준 시간대를 바꿨어요');
+  },
+  install: async () => { if (installEvt) { installEvt.prompt(); installEvt = null; } },
+  pickphoto: () => $('#photo').click(),
+  photo: (d, el) => { const f = el.files && el.files[0]; if (f) uploadPhoto(f, +$('#pyear').value); el.value = ''; },
+  delphoto: async d => {
+    const a = S.avatars.find(x => x.user_id === S.user.id && x.year === +d.y);
+    if (!a || !confirm(`${a.year}년 사진을 삭제할까요?`)) return;
+    await sb.storage.from(AV_BUCKET).remove([a.path]);
+    const { error } = await sb.from('avatars').delete().match({ family_id: S.family.id, user_id: S.user.id, year: a.year });
+    if (error) return toast(errMsg(error));
+    render();
+  },
+  newplan: () => openPlanForm(null),
+  schedule: d => openSchedule(d.id),
+  editplan: d => openPlanForm(S.plans.find(p => p.id === d.id)),
+  saveplan: () => savePlan(),
+  otoggle: d => { S.form.order[+d.i].on = !S.form.order[+d.i].on; drawOrder(); },
+  oup: d => { const i = +d.i, o = S.form.order; [o[i - 1], o[i]] = [o[i], o[i - 1]]; drawOrder(); },
+  odown: d => { const i = +d.i, o = S.form.order; [o[i + 1], o[i]] = [o[i], o[i + 1]]; drawOrder(); },
+  archive: async d => { if (!confirm('이 책 읽기를 끝낼까요? 녹음은 그대로 남아요.')) return; await sb.from('plans').update({ archived: true }).eq('id', d.id); render(); },
+  unarchive: async d => { await sb.from('plans').update({ archived: false }).eq('id', d.id); render(); },
+  delplan: async d => {
+    if (!confirm('이 읽기 계획을 삭제할까요?\n녹음 파일은 날짜별 기록에 남지만, 이어 듣기 목록에서는 빠져요.')) return;
+    const { error } = await sb.from('plans').delete().eq('id', d.id);
+    if (error) return toast(errMsg(error));
+    render();
+  },
+};
+const CHANGE_ACTS = new Set(['authmode', 'lplan', 'lwho', 'tz', 'otoggle', 'photo', 'logmode', 'tmonth', 'twho']);
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if (!el || CHANGE_ACTS.has(el.dataset.act) || el.disabled) return;
+  const f = ACT[el.dataset.act]; if (f) { e.preventDefault(); f(el.dataset, el); }
+});
+document.addEventListener('change', e => {
+  const el = e.target.closest('[data-act]'); if (!el || !CHANGE_ACTS.has(el.dataset.act)) return;
+  ACT[el.dataset.act](el.dataset, el);
+});
+
+boot().catch(e => view(`<div class="card"><p>시작 실패: ${esc(errMsg(e))}</p><button data-act="reload">다시 시도</button></div>`));
+</script>
+</body>
+</html>
